@@ -1,3 +1,22 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.leaflet-interactive:focus {
+  outline: none;
+}
+
+.leaflet-tooltip.country-tooltip {
+  background-color: #1f2937; /* dark slate */
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  border: 1px solid #3b82f6; /* Tailwind blue-500 */
+}
+
+.leaflet-tooltip.country-tooltip::before {
+  display: none; /* hides the little arrow pointer */
+}
