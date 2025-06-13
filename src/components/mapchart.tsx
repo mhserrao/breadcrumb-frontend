@@ -1,14 +1,14 @@
-import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
-import { useEffect, useRef, useState } from 'react';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
+import { useEffect, useRef, useState } from "react";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
 
 const MapChart = () => {
   const [geoData, setGeoData] = useState<any>(null);
   const geoJsonRef = useRef<L.GeoJSON | null>(null);
 
   useEffect(() => {
-    fetch('/world.geo.json')
+    fetch("/world.geo.json")
       .then((res) => res.json())
       .then((data) => {
         // Add "visited" flag to each feature
@@ -21,9 +21,9 @@ const MapChart = () => {
 
   const styleFeature = (feature: any) => {
     return {
-      fillColor: feature.properties.visited ? '#60a5fa' : '#e5e7eb',
+      fillColor: feature.properties.visited ? "#60a5fa" : "#e5e7eb",
       weight: 1,
-      color: '#ccc',
+      color: "#ccc",
       fillOpacity: 0.7,
     };
   };
@@ -32,13 +32,19 @@ const MapChart = () => {
     layer.on({
       click: () => {
         feature.properties.visited = !feature.properties.visited;
-
-        // Update the clicked country's style only
         layer.setStyle(styleFeature(feature));
       },
     });
 
-    layer.bindTooltip(feature.properties.ADMIN);
+    // ✅ Safely bind tooltip with fallback
+    const name =
+      feature.properties.ADMIN || feature.properties.name || "Unknown";
+    layer.bindTooltip(name, {
+      sticky: true,
+      direction: "top",
+      opacity: 0.9,
+      className: "country-tooltip", // optional custom class
+    });
   };
 
   return (
@@ -49,7 +55,7 @@ const MapChart = () => {
         minZoom={2}
         maxZoom={6}
         scrollWheelZoom={true}
-        style={{ height: '100%', width: '100%' }}
+        style={{ height: "100%", width: "100%" }}
         maxBounds={[
           [-85, -180],
           [85, 180],
