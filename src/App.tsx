@@ -1,18 +1,13 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-import Header from './components/header';
-import MapChart from './components/mapchart';
+import React from "react";
+import { BrowserRouter as Router } from "react-router-dom";
+import AppRoutes from "./AppRoutes";
 
-function App() {
+const App: React.FC = () => {
   return (
-     <div className="flex flex-col h-screen">
-      <Header />
-      <main className="flex-1">
-        <MapChart />
-      </main>
-    </div>
+    <Router>
+      <AppRoutes />
+    </Router>
   );
-}
+};
 
 export default App;
