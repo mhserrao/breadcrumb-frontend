@@ -1,60 +1,48 @@
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
+import { useEffect, useRef, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
-import { useEffect, useState, useRef } from 'react';
 import L from 'leaflet';
 
 const MapChart = () => {
   const [geoData, setGeoData] = useState<any>(null);
-  const [visited, setVisited] = useState<Set<string>>(new Set());
   const geoJsonRef = useRef<L.GeoJSON | null>(null);
 
   useEffect(() => {
     fetch('/world.geo.json')
-      .then(res => res.json())
-      .then(data => setGeoData(data));
+      .then((res) => res.json())
+      .then((data) => {
+        // Add "visited" flag to each feature
+        data.features.forEach((feature: any) => {
+          feature.properties.visited = false;
+        });
+        setGeoData(data);
+      });
   }, []);
 
-  useEffect(() => {
-    // Manually update the style for each feature
-    if (geoJsonRef.current) {
-      geoJsonRef.current.eachLayer((layer: any) => {
-        const countryCode = layer.feature.properties.ISO_A3;
-        const isVisited = visited.has(countryCode);
-        layer.setStyle({
-          fillColor: isVisited ? '#3b82f6' : '#e5e7eb',
-          weight: 1,
-          color: '#ccc',
-          fillOpacity: 0.7,
-        });
-      });
-    }
-  }, [visited]);
+  const styleFeature = (feature: any) => {
+    return {
+      fillColor: feature.properties.visited ? '#60a5fa' : '#e5e7eb',
+      weight: 1,
+      color: '#ccc',
+      fillOpacity: 0.7,
+    };
+  };
 
   const onEachCountry = (feature: any, layer: any) => {
-    const countryCode = feature.properties.ISO_A3;
-
     layer.on({
       click: () => {
-        setVisited(prev => {
-          const next = new Set(prev);
-          next.has(countryCode) ? next.delete(countryCode) : next.add(countryCode);
-          return next;
-        });
+        feature.properties.visited = !feature.properties.visited;
+
+        // Update the clicked country's style only
+        layer.setStyle(styleFeature(feature));
       },
     });
 
     layer.bindTooltip(feature.properties.ADMIN);
   };
 
-  const initialStyle = () => ({
-    fillColor: '#e5e7eb',
-    weight: 1,
-    color: '#ccc',
-    fillOpacity: 0.7,
-  });
-
   return (
-    <div className="h-screen w-full bg-slate-50">
+    <div className="h-screen w-full bg-slate-100">
       <MapContainer
         center={[20, 0]}
         zoom={2}
@@ -62,7 +50,10 @@ const MapChart = () => {
         maxZoom={6}
         scrollWheelZoom={true}
         style={{ height: '100%', width: '100%' }}
-        maxBounds={[[-85, -180], [85, 180]]}
+        maxBounds={[
+          [-85, -180],
+          [85, 180],
+        ]}
         maxBoundsViscosity={1.0}
         worldCopyJump={false}
       >
@@ -71,12 +62,11 @@ const MapChart = () => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           noWrap={true}
         />
-
         {geoData && (
           <GeoJSON
             data={geoData}
             onEachFeature={onEachCountry}
-            style={initialStyle}
+            style={styleFeature}
             ref={geoJsonRef}
           />
         )}
