@@ -4,7 +4,7 @@ import AppRoutes from "./AppRoutes";
 
 const App: React.FC = () => {
   return (
-    <BrowserRouter basename="/breadcrumb">
+    <BrowserRouter>
       <AppRoutes />
     </BrowserRouter>
   );
