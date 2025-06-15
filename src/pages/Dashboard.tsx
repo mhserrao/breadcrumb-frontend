@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import MapChart from "../components/Mapchart";
 import VisitedList from "../components/VisitedList";
 

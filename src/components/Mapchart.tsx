@@ -6,22 +6,20 @@ import L from "leaflet";
 const MapChart = () => {
   const [geoData, setGeoData] = useState<any>(null);
   const geoJsonRef = useRef<L.GeoJSON | null>(null);
+  const [visitedCountries, setVisitedCountries] = useState<string[]>([]);
 
   useEffect(() => {
     fetch("/world.geo.json")
       .then((res) => res.json())
       .then((data) => {
-        // Add "visited" flag to each feature
-        data.features.forEach((feature: any) => {
-          feature.properties.visited = false;
-        });
-        setGeoData(data);
+        setGeoData(data); // ❌ Removed setting visited on each feature
       });
   }, []);
 
   const styleFeature = (feature: any) => {
+    const code = feature.properties["ISO3166-1-Alpha-2"];
     return {
-      fillColor: feature.properties.visited ? "#60a5fa" : "#e5e7eb",
+      fillColor: visitedCountries.includes(code) ? "#60a5fa" : "#e5e7eb",
       weight: 1,
       color: "#ccc",
       fillOpacity: 0.7,
@@ -29,23 +27,41 @@ const MapChart = () => {
   };
 
   const onEachCountry = (feature: any, layer: any) => {
+    const code = feature.properties["ISO3166-1-Alpha-2"];
+    if (!code) return;
+
     layer.on({
       click: () => {
-        feature.properties.visited = !feature.properties.visited;
-        layer.setStyle(styleFeature(feature));
+        setVisitedCountries((prev) => {
+          const isVisited = prev.includes(code);
+          const updated = isVisited
+            ? prev.filter((c) => c !== code)
+            : [...prev, code];
+          return updated;
+        });
       },
     });
 
-    // ✅ Safely bind tooltip with fallback
     const name =
       feature.properties.ADMIN || feature.properties.name || "Unknown";
     layer.bindTooltip(name, {
       sticky: true,
       direction: "top",
       opacity: 0.9,
-      className: "country-tooltip", // optional custom class
+      className: "country-tooltip",
     });
   };
+
+  // 👇 Refresh map styles on visitedCountries change
+  useEffect(() => {
+    console.log("Visited countries:", visitedCountries);
+    if (geoJsonRef.current) {
+      geoJsonRef.current.eachLayer((layer: any) => {
+        const feature = layer.feature;
+        layer.setStyle(styleFeature(feature));
+      });
+    }
+  }, [visitedCountries]);
 
   return (
     <div className="h-screen w-full bg-slate-100">
