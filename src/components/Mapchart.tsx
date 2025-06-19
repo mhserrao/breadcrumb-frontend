@@ -1,5 +1,8 @@
 import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import { useEffect, useRef, useState } from "react";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import { auth, db } from "../auth/firebase";
+import { useAuthState } from "react-firebase-hooks/auth";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
@@ -14,14 +17,36 @@ const MapChart: React.FC<MapChartProps> = ({
 }) => {
   const [geoData, setGeoData] = useState<any>(null);
   const geoJsonRef = useRef<L.GeoJSON | null>(null);
+  const [user] = useAuthState(auth);
 
   useEffect(() => {
-    fetch("/world.geo.json")
-      .then((res) => res.json())
-      .then((data) => {
+    const loadMapAndVisitedCountries = async () => {
+      try {
+        const response = await fetch("/world.geo.json");
+        const data = await response.json();
+
+        // Step 1: Load map data
         setGeoData(data);
-      });
-  }, []);
+
+        // Step 2: If user is logged in, load visited countries from Firestore
+        if (user) {
+          const docRef = doc(db, "users", user.uid);
+          const docSnap = await getDoc(docRef);
+
+          if (docSnap.exists()) {
+            const savedData = docSnap.data();
+            if (Array.isArray(savedData.visitedCountries)) {
+              setVisitedCountries(savedData.visitedCountries);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error loading map or visited countries:", error);
+      }
+    };
+
+    loadMapAndVisitedCountries();
+  }, [user]);
 
   const styleFeature = (feature: any) => {
     const code = feature.properties["ISO3166-1-Alpha-2"];
@@ -70,9 +95,21 @@ const MapChart: React.FC<MapChartProps> = ({
     }
   }, [visitedCountries]);
 
-  const handleSave = () => {
-    console.log("Saving countries:", visitedCountries);
-    // we'll save to Firestore in the next step
+  const handleSave = async () => {
+    if (!user) {
+      alert("Please log in to save your visited countries.");
+      return;
+    }
+
+    try {
+      await setDoc(doc(db, "users", user.uid), {
+        visitedCountries,
+      });
+      alert("Visited countries saved successfully!");
+    } catch (error) {
+      console.error("Error saving visited countries:", error);
+      alert("An error occurred while saving.");
+    }
   };
 
   return (
