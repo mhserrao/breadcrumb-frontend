@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import MapChart from "../components/Mapchart";
 import VisitedList from "../components/VisitedList";
 
