@@ -1,19 +1,19 @@
 import React from "react";
 
-const VisitedList: React.FC = () => {
-  const visitedCountries = ["Canada", "Japan", "France"]; // This will eventually come from user state
+type VisitedListProps = {
+  visitedCountries: string[];
+};
 
+const VisitedList: React.FC<VisitedListProps> = ({ visitedCountries }) => {
   return (
     <div>
-      <h2 className="text-lg font-semibold mb-4 text-indigo-600">
-        Visited Countries
-      </h2>
-      <ul className="space-y-2">
-        {visitedCountries.map((country, index) => (
-          <li key={index} className="text-gray-800">
-            • {country}
-          </li>
-        ))}
+      <h2 className="text-lg font-semibold mb-2">Visited Countries</h2>
+      <ul className="list-disc list-inside">
+        {visitedCountries.length > 0 ? (
+          visitedCountries.map((code) => <li key={code}>{code}</li>)
+        ) : (
+          <li className="text-gray-500 italic">No countries selected.</li>
+        )}
       </ul>
     </div>
   );

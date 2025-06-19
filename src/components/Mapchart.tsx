@@ -3,16 +3,23 @@ import { useEffect, useRef, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
-const MapChart = () => {
+type MapChartProps = {
+  visitedCountries: string[];
+  setVisitedCountries: React.Dispatch<React.SetStateAction<string[]>>;
+};
+
+const MapChart: React.FC<MapChartProps> = ({
+  visitedCountries,
+  setVisitedCountries,
+}) => {
   const [geoData, setGeoData] = useState<any>(null);
   const geoJsonRef = useRef<L.GeoJSON | null>(null);
-  const [visitedCountries, setVisitedCountries] = useState<string[]>([]);
 
   useEffect(() => {
     fetch("/world.geo.json")
       .then((res) => res.json())
       .then((data) => {
-        setGeoData(data); // ❌ Removed setting visited on each feature
+        setGeoData(data);
       });
   }, []);
 
@@ -63,8 +70,21 @@ const MapChart = () => {
     }
   }, [visitedCountries]);
 
+  const handleSave = () => {
+    console.log("Saving countries:", visitedCountries);
+    // we'll save to Firestore in the next step
+  };
+
   return (
-    <div className="h-screen w-full bg-slate-100">
+    <div className="h-screen w-full bg-slate-100 relative">
+      {/* Save Button - top right corner */}
+      <button
+        onClick={handleSave}
+        className="absolute top-4 right-4 z-[1000] bg-indigo-600 text-white px-4 py-2 rounded shadow hover:bg-indigo-700 transition"
+      >
+        Save Countries
+      </button>
+
       <MapContainer
         center={[20, 0]}
         zoom={2}
