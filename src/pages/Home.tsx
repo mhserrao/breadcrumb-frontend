@@ -5,7 +5,7 @@ const Home: React.FC = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen text-center px-4">
       <h1 className="text-4xl font-bold text-indigo-600 mb-4">
-        🌍 Welcome to Breadcrumb
+        🍞 Welcome to Breadcrumb
       </h1>
       <p className="text-lg text-gray-700 max-w-xl mb-8">
         Track your travels by selecting countries you've visited. Visualize your

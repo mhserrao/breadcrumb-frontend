@@ -18,7 +18,7 @@ const Header: React.FC<HeaderProps> = ({ user }) => {
   return (
     <header className="bg-white shadow-md py-4 px-6 flex justify-between items-center">
       <Link to="/" className="text-2xl font-bold text-indigo-600">
-        Breadcrumb
+        🍞 Breadcrumb
       </Link>
       <nav className="space-x-4">
         {user ? (
