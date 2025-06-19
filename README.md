@@ -1,46 +1,122 @@
-# Getting Started with Create React App
+# 🍞 Breadcrumb
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Breadcrumb is an interactive travel map web application that lets users track the countries they’ve visited. It provides a personalized, visual experience where users can log in, click on countries to mark them as visited, and see their travel history come to life.
 
-## Available Scripts
+## 🚀 Features
 
-In the project directory, you can run:
+### ✅ Interactive World Map
 
-### `npm start`
+- Displays a full world map using **React Leaflet** and **GeoJSON** data.
+- Users can **click on a country** to toggle its visited state (highlighted in blue).
+- Tooltips show the country names on hover.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### ✅ User Authentication
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+- Implemented via **Firebase Authentication** with support for login and signup.
+- Each user’s visited countries are saved and retrieved from the **Firestore database**.
 
-### `npm test`
+### ✅ Visited Country Persistence
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- When logged in, visited countries are **automatically fetched** from Firestore.
+- Clicking on a country updates the map and **saves the change to the database**.
 
-### `npm run build`
+### ✅ Responsive Layout
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- Clean and minimal design styled with **TailwindCSS**.
+- The dashboard layout splits the screen between the interactive map and a sidebar.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 🔧 Tech Stack
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- **React (TypeScript)**
+- **React Leaflet** for map rendering
+- **Firebase** (Authentication + Firestore)
+- **TailwindCSS** for styling
+- **Netlify** for deployment
 
-### `npm run eject`
+## 🌐 Live URL
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+- 🔗 **App:** [https://breadcrumb-mhserrao.netlify.app](https://breadcrumb-mhserrao.netlify.app)
+- 🔗 **Embedded in Portfolio:** [https://mhserrao.dev/breadcrumb](https://mhserrao.dev/breadcrumb)
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 📁 Project Structure (simplified)
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+src/
+│
+├── auth/
+│ └── firebase.ts # Firebase config and auth exports
+│
+├── components/
+│ ├── Header.tsx # App header with login/signup links
+│ ├── MapChart.tsx # Interactive map component
+│ └── VisitedList.tsx # (Optional) Sidebar list of visited countries
+│
+├── db/
+│ └── firestorehelper.ts # Firestore helpers for saving countries
+│
+├── pages/
+│ ├── Dashboard.tsx # Main map dashboard
+│ └── Home.tsx # Landing page with hero and CTA
+│
+├── App.tsx # Routing wrapper
+├── AppRoutes.tsx # All defined routes
+└── index.tsx # Entry point
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+---
 
-## Learn More
+## 🛠️ Setup Instructions
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Follow these steps to run the Breadcrumb app locally:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### 1. **Clone the Repository**
+
+```bash
+git clone https://github.com/your-username/breadcrumb.git
+cd breadcrumb
+```
+
+### 2. **Install Dependencies**
+
+```bash
+npm install
+```
+
+### 3. **Add Environment Variables**
+
+Create a `.env` file in the root of the project with the following Firebase configuration:
+
+```
+REACT_APP_FIREBASE_API_KEY=your_api_key
+REACT_APP_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+REACT_APP_FIREBASE_PROJECT_ID=your_project_id
+REACT_APP_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+REACT_APP_FIREBASE_APP_ID=your_app_id
+```
+
+> ⚠️ Never commit this `.env` file to version control (it's already in `.gitignore` by default).
+
+### 4. **Start the Development Server**
+
+```bash
+npm start
+```
+
+Your app will run on [http://localhost:3000](http://localhost:3000)
+
+---
+
+## 📦 Tech Stack
+
+- React + TypeScript
+- Leaflet.js
+- Firebase Auth & Firestore
+- TailwindCSS
+
+---
+
+## 🧩 Upcoming Features
+
+- Save countries users want to visit
+- Display list of countries by continent
+- Travel stats (e.g., % of world visited)
+- Social sharing features
