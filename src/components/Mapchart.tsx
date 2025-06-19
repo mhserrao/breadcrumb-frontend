@@ -1,5 +1,5 @@
 import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { auth, db } from "../auth/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -19,16 +19,26 @@ const MapChart: React.FC<MapChartProps> = ({
   const geoJsonRef = useRef<L.GeoJSON | null>(null);
   const [user] = useAuthState(auth);
 
+  const styleFeature = useCallback(
+    (feature: any) => {
+      const code = feature.properties["ISO3166-1-Alpha-2"];
+      return {
+        fillColor: visitedCountries.includes(code) ? "#60a5fa" : "#e5e7eb",
+        weight: 1,
+        color: "#ccc",
+        fillOpacity: 0.7,
+      };
+    },
+    [visitedCountries]
+  );
+
   useEffect(() => {
     const loadMapAndVisitedCountries = async () => {
       try {
         const response = await fetch("/world.geo.json");
         const data = await response.json();
-
-        // Step 1: Load map data
         setGeoData(data);
 
-        // Step 2: If user is logged in, load visited countries from Firestore
         if (user) {
           const docRef = doc(db, "users", user.uid);
           const docSnap = await getDoc(docRef);
@@ -46,17 +56,7 @@ const MapChart: React.FC<MapChartProps> = ({
     };
 
     loadMapAndVisitedCountries();
-  }, [user]);
-
-  const styleFeature = (feature: any) => {
-    const code = feature.properties["ISO3166-1-Alpha-2"];
-    return {
-      fillColor: visitedCountries.includes(code) ? "#60a5fa" : "#e5e7eb",
-      weight: 1,
-      color: "#ccc",
-      fillOpacity: 0.7,
-    };
-  };
+  }, [user, setVisitedCountries]);
 
   const onEachCountry = (feature: any, layer: any) => {
     const code = feature.properties["ISO3166-1-Alpha-2"];
@@ -64,13 +64,9 @@ const MapChart: React.FC<MapChartProps> = ({
 
     layer.on({
       click: () => {
-        setVisitedCountries((prev) => {
-          const isVisited = prev.includes(code);
-          const updated = isVisited
-            ? prev.filter((c) => c !== code)
-            : [...prev, code];
-          return updated;
-        });
+        setVisitedCountries((prev) =>
+          prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code]
+        );
       },
     });
 
@@ -84,7 +80,6 @@ const MapChart: React.FC<MapChartProps> = ({
     });
   };
 
-  // 👇 Refresh map styles on visitedCountries change
   useEffect(() => {
     console.log("Visited countries:", visitedCountries);
     if (geoJsonRef.current) {
@@ -93,7 +88,7 @@ const MapChart: React.FC<MapChartProps> = ({
         layer.setStyle(styleFeature(feature));
       });
     }
-  }, [visitedCountries]);
+  }, [visitedCountries, styleFeature]);
 
   const handleSave = async () => {
     if (!user) {
@@ -114,7 +109,6 @@ const MapChart: React.FC<MapChartProps> = ({
 
   return (
     <div className="h-screen w-full bg-slate-100 relative">
-      {/* Save Button - top right corner */}
       <button
         onClick={handleSave}
         className="absolute top-4 right-4 z-[1000] bg-indigo-600 text-white px-4 py-2 rounded shadow hover:bg-indigo-700 transition"
