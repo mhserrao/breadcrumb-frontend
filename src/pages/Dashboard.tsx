@@ -4,6 +4,7 @@ import VisitedList from "../components/VisitedList";
 
 const Dashboard: React.FC = () => {
   const [visitedCountries, setVisitedCountries] = useState<string[]>([]);
+  const [savedCountries, setSavedCountries] = useState<string[]>([]);
 
   return (
     <div className="w-full min-h-screen flex">
@@ -12,12 +13,17 @@ const Dashboard: React.FC = () => {
         <MapChart
           visitedCountries={visitedCountries}
           setVisitedCountries={setVisitedCountries}
+          savedCountries={savedCountries}
+          setSavedCountries={setSavedCountries}
         />
       </div>
 
       {/* Visited countries list - 20% */}
       <div className="w-1/5 p-4 bg-gray-50 border-l border-gray-200 overflow-y-auto">
-        <VisitedList visitedCountries={visitedCountries} />
+        <VisitedList
+          visitedCountries={visitedCountries}
+          savedCountries={savedCountries}
+        />
       </div>
     </div>
   );

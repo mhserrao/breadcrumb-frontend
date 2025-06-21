@@ -5,21 +5,34 @@ const countryNames: Record<string, string> = countryNamesData;
 
 type VisitedListProps = {
   visitedCountries: string[];
+  savedCountries: string[];
 };
 
-const VisitedList: React.FC<VisitedListProps> = ({ visitedCountries }) => {
+const VisitedList: React.FC<VisitedListProps> = ({
+  visitedCountries,
+  savedCountries,
+}) => {
   return (
     <div>
-      <h2 className="text-lg font-semibold mb-2">Visited Countries</h2>
-      <ul className="list-disc list-inside">
-        {visitedCountries.length > 0 ? (
-          visitedCountries.map((code) => (
-            <li key={code}>{countryNames[code] || code}</li>
-          ))
-        ) : (
-          <li className="text-gray-500 italic">No countries selected.</li>
-        )}
-      </ul>
+      <h2 className="font-bold mb-2">Visited Countries</h2>
+      {visitedCountries.length === 0 ? (
+        <p className="text-gray-400">No countries selected.</p>
+      ) : (
+        <ul className="space-y-1">
+          {visitedCountries.map((code) => (
+            <li
+              key={code}
+              className={`${
+                savedCountries.includes(code)
+                  ? "text-blue-600"
+                  : "text-yellow-600"
+              }`}
+            >
+              {countryNames[code] || code}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

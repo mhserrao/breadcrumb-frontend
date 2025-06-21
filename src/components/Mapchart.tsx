@@ -9,11 +9,15 @@ import L from "leaflet";
 type MapChartProps = {
   visitedCountries: string[];
   setVisitedCountries: React.Dispatch<React.SetStateAction<string[]>>;
+  savedCountries: string[];
+  setSavedCountries: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
 const MapChart: React.FC<MapChartProps> = ({
   visitedCountries,
   setVisitedCountries,
+  savedCountries,
+  setSavedCountries,
 }) => {
   const [geoData, setGeoData] = useState<any>(null);
   const geoJsonRef = useRef<L.GeoJSON | null>(null);
@@ -22,14 +26,35 @@ const MapChart: React.FC<MapChartProps> = ({
   const styleFeature = useCallback(
     (feature: any) => {
       const code = feature.properties["ISO3166-1-Alpha-2"];
-      return {
-        fillColor: visitedCountries.includes(code) ? "#60a5fa" : "#e5e7eb",
-        weight: 1,
-        color: "#ccc",
-        fillOpacity: 0.7,
-      };
+      if (!code) return {};
+
+      if (savedCountries.includes(code)) {
+        // ✅ Already saved = blue
+        return {
+          fillColor: "#60a5fa",
+          weight: 1,
+          color: "#ccc",
+          fillOpacity: 0.7,
+        };
+      } else if (visitedCountries.includes(code)) {
+        // ✅ Unsaved, newly selected = yellow
+        return {
+          fillColor: "#facc15",
+          weight: 1,
+          color: "#ccc",
+          fillOpacity: 0.7,
+        };
+      } else {
+        // Not visited
+        return {
+          fillColor: "#e5e7eb",
+          weight: 1,
+          color: "#ccc",
+          fillOpacity: 0.7,
+        };
+      }
     },
-    [visitedCountries]
+    [visitedCountries, savedCountries]
   );
 
   useEffect(() => {
@@ -47,6 +72,8 @@ const MapChart: React.FC<MapChartProps> = ({
             const savedData = docSnap.data();
             if (Array.isArray(savedData.visitedCountries)) {
               setVisitedCountries(savedData.visitedCountries);
+              setSavedCountries(savedData.visitedCountries); // ← Add this!
+              console.log("Loaded from Firestore:", savedData.visitedCountries);
             }
           }
         }
@@ -100,6 +127,7 @@ const MapChart: React.FC<MapChartProps> = ({
       await setDoc(doc(db, "users", user.uid), {
         visitedCountries,
       });
+      setSavedCountries(visitedCountries);
       alert("Visited countries saved successfully!");
     } catch (error) {
       console.error("Error saving visited countries:", error);
